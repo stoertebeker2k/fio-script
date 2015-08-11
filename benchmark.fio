@@ -1,0 +1,22 @@
+[global]
+rw=${readwrite}
+ioengine=libaio
+iodepth=64
+size=1g
+direct=1
+buffered=0
+startdelay=5
+ramp_time=5
+runtime=20
+time_based
+disk_util=0
+clat_percentiles=0
+disable_lat=1
+disable_clat=1
+disable_slat=1
+directory=${directory}
+
+[test]
+name=${size} test
+bs=${size}
+stonewall
