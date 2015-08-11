@@ -3,13 +3,15 @@ echo "Benchmark-Script"
 echo
 #####Variablen
 #Blockgröße
-size1=("1m" "4m")
+size1=("4k" "8k" "16k" "32k" "64k" "128k" "256k" "512k" "1m" "2m" "4m" "8m" "16m" "32m" "64m" "128m")
 #Benchmarkpfad
 directory1="/mnt/md/"
-#Lese/Schreib-Option
-readwrite1=("read" "write")
+#Lese/Schreib-Option (read, write, randread, randwrite, randrw
+readwrite1=("read" "randread" "write" "randwrite")
 #Anzahl der Durchläufe für Mittelwert
 runs=3
+#Name Ausgabedatei (Endung: csv)
+filename="out"
 #Counter-Variable (nicht verändern!)
 i=0
 
@@ -55,7 +57,8 @@ for rwwert in ${readwrite1[@]}
 	result=$(($zwischenwert/$runs))
 	echo Mittelwert: $(($result/1024)) MB/s
 	echo "##################"
-	
+	echo "$blksize"";""$rwwert"";"$(($result/1024)) >> $filename.csv
+
 	result=0
 	i=0
 	zwischenwert=0
