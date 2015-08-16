@@ -1,4 +1,8 @@
 #!/bin/bash
+
+##TODO
+# tmp-folder erstellen geht noch nicht
+
 echo "Benchmark-Script"
 echo
 #####Variablen
@@ -11,7 +15,14 @@ readwrite1=("read" "randread" "write" "randwrite")
 #Anzahl der Durchläufe für Mittelwert
 runs=3
 #Name Ausgabedatei (Endung: csv)
-filename="out"
+filename=$1
+if [ -z "$filename" ]
+then
+	filename=out
+	echo "Kein Output-Name angegeben, verwende out.csv..."
+	echo ""
+	sleep 3
+fi
 #Counter-Variable (nicht verändern!)
 i=0
 

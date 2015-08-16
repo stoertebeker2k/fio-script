@@ -12,8 +12,23 @@ mountpoint="/mnt/md"
 username="stoertebeker"
 ##### Parametercheck
 
+if [ -z "$1" ]
+then
+	echo kein RAID-Typ angegeben!
+	echo Korrekte Verwendung: ./raid-script.sh RAID-Typ Anzahl_Festplatten
+	exit 1
+fi
+
+if [ -z "$2" ]
+then
+        echo Keine Festplattenanzahl angegeben!
+        echo Korrekte Verwendung: ./raid-script.sh RAID-Typ Anzahl_Festplatten
+        exit 1
+fi
+
 echo RAID-Typ: $1
 echo Anzahl HDDs: $2
+sleep 1
 
 ##### Script
 
