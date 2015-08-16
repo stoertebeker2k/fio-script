@@ -94,7 +94,7 @@ echo 1000 > /proc/sys/dev/raid/speed_limit_min
 
 ## Benchmark
 echo Benchmark ...
-./fio-bench.sh raid$1-devices$2
+./fiobench.sh raid$1-devices$2
 sleep 2
 
 ### RAID abbauen
