@@ -6,8 +6,8 @@ fi
 
 ##### Variablen
 
-devices=("/dev/sdb" "/dev/sdc" "/dev/sdd" "/dev/sde" "/dev/sdf" "/dev/sdg" "/dev/sdh" "/dev/sdi" "/dev/sdj" "/dev/sdk" "/dev/sdl" "/dev/sdm" "/dev/sdn" "/dev/sdo" "/dev/sdp")
-partitions=("/dev/sdb1" "/dev/sdc1" "/dev/sdd1" "/dev/sde1" "/dev/sdf1" "/dev/sdg1" "/dev/sdh1" "/dev/sdi1" "/dev/sdj1" "/dev/sdk1" "/dev/sdl1" "/dev/sdm1" "/dev/sdn1" "/dev/sdo1" "/dev/sdp1")
+devices=("/dev/sdc" "/dev/sdd" "/dev/sde" "/dev/sdf" "/dev/sdg" "/dev/sdh" "/dev/sdi" "/dev/sdj" "/dev/sdk" "/dev/sdl" "/dev/sdm" "/dev/sdn" "/dev/sdo" "/dev/sdp")
+partitions=("/dev/sdc1" "/dev/sdd1" "/dev/sde1" "/dev/sdf1" "/dev/sdg1" "/dev/sdh1" "/dev/sdi1" "/dev/sdj1" "/dev/sdk1" "/dev/sdl1" "/dev/sdm1" "/dev/sdn1" "/dev/sdo1" "/dev/sdp1")
 mountpoint="/mnt/md"
 username="stoertebeker"
 ##### Parametercheck
@@ -57,7 +57,7 @@ do
 done
 
 ## RAID erzeugen
-mdadm --create /dev/md0 --auto md --level=$1 --raid-devices=$2 ${devparms[@]}
+mdadm --create /dev/md0 --auto md -f --level=$1 --raid-devices=$2 ${devparms[@]}
 
 ## RAID5/6 Chunks
 #TODO
@@ -79,13 +79,14 @@ while [ $fertig -eq 0 ]
 do
 #status=$(mdadm -D /dev/md0 | head -12l | tail -1l | cut -d: -f2 | cut -d, -f 1)
 status="$(grep -Po "(?<=State : ).*(?=.)" < <(sudo mdadm -D /dev/md0))"
-if [ "$status" == "clean" ]
+process="$(grep -Po "(?<=Resync Status : ).*(?=.)" < <(sudo mdadm -D /dev/md0))"
+if [ "$status" == "clean" ] || [ "$status" == "active" ]
 	then
 		echo "RAID clean!"
-		sleep 5
+		sleep 2
 		fertig=1
 	else
-		echo "processing"
+		echo "RAID-Status: $process"
 		sleep 5
 fi
 done
@@ -94,7 +95,8 @@ echo 1000 > /proc/sys/dev/raid/speed_limit_min
 
 ## Benchmark
 echo Benchmark ...
-./fiobench.sh raid$1-devices$2
+./fiobench.sh
+./fiobench.sh raid$1devices$2
 sleep 2
 
 ### RAID abbauen

@@ -21,7 +21,11 @@ then
 	filename=out
 	echo "Kein Output-Name angegeben, verwende out.csv..."
 	echo ""
-	sleep 3
+	sleep 2
+else
+	echo "Schreibe Output in $filename.csv"
+	echo ""
+	sleep 2
 fi
 #Counter-Variable (nicht verändern!)
 i=0
@@ -52,7 +56,7 @@ tmpfolder(){
 
 requirements
 
-tmpfolder
+#tmpfolder
 
 for rwwert in ${readwrite1[@]}
   do
@@ -77,4 +81,4 @@ for rwwert in ${readwrite1[@]}
 done
 
 rm tmp/output*.txt
-rmdir tmp
+#rmdir tmp
