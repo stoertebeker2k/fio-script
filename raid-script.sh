@@ -6,10 +6,11 @@ fi
 
 ##### Variablen
 
-devices=("/dev/sdc" "/dev/sdd" "/dev/sde" "/dev/sdf" "/dev/sdg" "/dev/sdh" "/dev/sdi" "/dev/sdj" "/dev/sdk" "/dev/sdl" "/dev/sdm" "/dev/sdn" "/dev/sdo" "/dev/sdp")
-partitions=("/dev/sdc1" "/dev/sdd1" "/dev/sde1" "/dev/sdf1" "/dev/sdg1" "/dev/sdh1" "/dev/sdi1" "/dev/sdj1" "/dev/sdk1" "/dev/sdl1" "/dev/sdm1" "/dev/sdn1" "/dev/sdo1" "/dev/sdp1")
+devices=("/dev/sdb" "/dev/sdc" "/dev/sdd" "/dev/sde" "/dev/sdf" "/dev/sdg" "/dev/sdh" "/dev/sdi" "/dev/sdj" "/dev/sdk" "/dev/sdl" "/dev/sdm" "/dev/sdn" "/dev/sdo")
+partitions=("/dev/sdb1" "/dev/sdc1" "/dev/sdd1" "/dev/sde1" "/dev/sdf1" "/dev/sdg1" "/dev/sdh1" "/dev/sdi1" "/dev/sdj1" "/dev/sdk1" "/dev/sdl1" "/dev/sdm1" "/dev/sdn1" "/dev/sdo1")
 mountpoint="/mnt/md"
 username="stoertebeker"
+
 ##### Parametercheck
 
 if [ -z "$1" ]
@@ -32,22 +33,43 @@ sleep 1
 
 ##### Script
 
+## RAID10-Abfrage ob gerade Anzahl Devices
+
+if [ "$1" -eq 10 ]
+  then
+    if [ "$2" -lt 2 ]
+      then
+        echo "zu wenige Devices angegeben, skip..."
+	exit 0
+    fi
+    if [ $((testnum%2)) -eq 0 ]
+      then
+        echo gerade
+      else
+      echo "Überspringe ungerade Anzahl Devices.."
+      exit 0
+    fi
+fi
+
 ## Partitonstabelle erstellen
 for ((i=0;i<"$2";i++))
 do
         parted -s "${devices[$i]}" mklabel gpt
+	echo "parted -s "${devices[$i]}" mklabel gpt"
 done
 
 ## Partitionen erstellen
 for ((i=0;i<"$2";i++))
 do
         parted -a optimal -- "${devices[$i]}" mkpart primary 2048s -8192s
+	echo "parted -a optimal -- "${devices[$i]}" mkpart primary 2048s -8192s"
 done
 
 ## Partition als RAID-Partition markieren
 for ((i=0;i<"$2";i++))
 do
         parted "${devices[$i]}" set 1 raid on
+	echo "parted "${devices[$i]}" set 1 raid on"
 done
 
 ## Devices zusammenzählen
@@ -57,16 +79,20 @@ do
 done
 
 ## RAID erzeugen
+echo "mdadm --create /dev/md0 --auto md -f --level=$1 --raid-devices=$2 ${devparms[@]}"
 mdadm --create /dev/md0 --auto md -f --level=$1 --raid-devices=$2 ${devparms[@]}
 
 ## RAID5/6 Chunks
 #TODO
 
 ## Dateisystem erzeugen
+echo "mkfs.ext4 /dev/md0"
 mkfs.ext4 /dev/md0 
 
 ## mounten
+echo "mount /dev/md0 $mountpoint"
 mount /dev/md0 $mountpoint
+echo "chown $username":"$username $mountpoint"
 chown $username":"$username $mountpoint
 
 ### Warteschleife, bis RAID fertig initialisiert ist
