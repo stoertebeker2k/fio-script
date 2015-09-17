@@ -42,7 +42,7 @@ if [ "$1" -eq 10 ]
         echo "zu wenige Devices angegeben, skip..."
 	exit 0
     fi
-    if [ $((testnum%2)) -eq 0 ]
+    if [ $(($2%2)) -eq 0 ]
       then
         echo gerade
       else
@@ -79,8 +79,8 @@ do
 done
 
 ## RAID erzeugen
-echo "mdadm --create /dev/md0 --auto md -f --level=$1 --raid-devices=$2 ${devparms[@]}"
-mdadm --create /dev/md0 --auto md -f --level=$1 --raid-devices=$2 ${devparms[@]}
+echo "mdadm --create /dev/md0 --auto md -f -R --level=$1 --raid-devices=$2 ${devparms[@]}"
+mdadm --create /dev/md0 --auto md -f -R --level=$1 --raid-devices=$2 ${devparms[@]}
 
 ## RAID5/6 Chunks
 #TODO
